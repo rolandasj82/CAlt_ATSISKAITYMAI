@@ -85,6 +85,10 @@ def kurti_demo_projektus(sessionx: Session):
 
 
 def kurti_demo_detalizacija(sessionx: Session):
+    # Patikrinimas ar buvo jau suvykdyta
+    esami_isl_duomenys = sessionx.query(Proj_Islaidos).all()
+    if len(esami_isl_duomenys) > 0:
+        return
     root_projs = sessionx.query(Proj_Irasas).all()
     data0 = [["Bendros", [["Bendros valandos", 0]]]]
     data1 = [["Mokymai", [["Mokymų valandos", 0]]]]
@@ -144,18 +148,22 @@ def kurti_demo_detalizacija(sessionx: Session):
     print("Projektų detalizacijos sukurtos...")
 
 
-def kurti_demo_TM_irasus(sesionx: Session):
+def kurti_demo_TM_irasus(sessionx: Session):
     komentarai = ["Nebaigti darbai.", "Negalima testi darbų, nes rangovas neatliko savųjų.", "Mano dalis jau padaryta",
                   "Dėl tolimesnių darbų, reikia daryti komandos susirinkimą",
                   "Trūksta resursų, farbai laiku nebus baigti", "Darbams užbaigti liko viena diena",
                   "Darbų metu įvyko sistemos lūžimas. Bus pretenzija iš kliento", "Viskas padaryta", " "]
-    visi_prj = sesionx.query(Proj_Irasas).all()
-    visi_vart = sesionx.query(NaujasVartotojas).all()
+    visi_prj = sessionx.query(Proj_Irasas).all()
+    visi_vart = sessionx.query(NaujasVartotojas).all()
     # Išrenkamas mėnesis
     dabar_dt = datetime.datetime.now()
     men_1 = dabar_dt - relativedelta(months=2)
     men_2 = dabar_dt - relativedelta(months=1)
-    men_l=[men_1,men_2]
+    men_l = [men_1, men_2]
+    # Patikrinimas ar buvo jau suvykdyta
+    esami_tm_duomenys = sessionx.query(TM_Irasas).all()
+    if len(esami_tm_duomenys) > 0:
+        return
     visi_irasai = []
     for men_x in men_l:
         d_num = calendar.monthrange(men_x.year, men_x.month)[1]
@@ -171,7 +179,7 @@ def kurti_demo_TM_irasus(sesionx: Session):
                         start_dt = datetime.datetime(men_x.year, men_x.month, dd, start_val, 0)
                         end_dt = datetime.datetime(men_x.year, men_x.month, dd, start_val + dirb_val, 0)
                         esam_proj = random.choice(visi_prj)
-                        proj_visos_isl = sesionx.query(Proj_Islaidos).filter(
+                        proj_visos_isl = sessionx.query(Proj_Islaidos).filter(
                             Proj_Islaidos.pr_nr.ilike(f"%{esam_proj.pr_nr}%")).all()
                         proj_visos_isl2 = [isl for isl in proj_visos_isl if len(isl.pr_nr) > 5]
                         esam_proj_kategor = random.choice(proj_visos_isl2)
@@ -180,6 +188,6 @@ def kurti_demo_TM_irasus(sesionx: Session):
                                          esam_proj_kategor.ded_aprasymas,
                                          start_dt, end_dt, komentaras)
                         visi_irasai.append(tm_1)
-    sesionx.add_all(visi_irasai)
-    sesionx.commit()
-    print("Praito mėnesio tabelis užpildytas...")
+    sessionx.add_all(visi_irasai)
+    sessionx.commit()
+    print("Dviejų mėnesių tabelis užpildytas...")

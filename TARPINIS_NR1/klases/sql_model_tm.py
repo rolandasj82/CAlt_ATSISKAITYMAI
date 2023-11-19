@@ -1,4 +1,5 @@
 import datetime
+import calendar
 from pathlib import Path
 from sqlalchemy import Column, Integer, String, DateTime, create_engine, ForeignKey, Float
 from sqlalchemy.orm import relationship, Session
@@ -179,6 +180,7 @@ def rodyti_visus_projektus(sessionx: Session):
             print(tarp0, pr.id, ".", pr.pr_nr, pr.pr_vardas, tarp1, pr.pr_aprasymas, tarp2,
                   pr.pr_pradzia.strftime("%Y-%m-%d"), "-->", pr.pr_pabaiga.strftime("%Y-%m-%d"), tarp3, pr.pr_verte,
                   pr.pr_valiuta)
+    print("\n")
 
 
 def rodyti_proj_detalizacija(sessionx: Session, raktas=None):
@@ -237,3 +239,86 @@ def prisijungti(sessionx: Session):
             if input("Jei norite išeiti spauskite 'q': ") == "q":
                 exit(-9)
     return None
+
+
+def tabelio_ataskaita(sessionx: Session, esam_vart: NaujasVartotojas = None):
+    # Jeigu admin prisijunge
+    print("\n\n")
+    if esam_vart.vardas == "admin":
+        # spausdinami visi vartotojai
+        visi_vart = sessionx.query(NaujasVartotojas).all()
+        print("Visi programos vartotojai:")
+        print("-------------------------:")
+        for v in visi_vart:
+            print("id:", v.id, " vardas:", v.vardas)
+        try:
+            sel_var = int(input("Pasirinkite vartotoją, pagal ID, kurio duomenis norite matyti: "))
+        except ValueError:
+            print("KLAIDA: įvedėte ne skaičių!")
+            return
+        for v in visi_vart:
+            if v.id == sel_var:
+                esam_vart = v
+    try:
+        sel_met = int(input("Įveskite metus, iš kurių norite gauti ataskaitą (pvz.: 2023): "))
+        sel_men = int(input("Įveskite menesį, kurio ataskaitą norite gauti (pvz.: 9): "))
+        if sel_men not in range(1, 13):
+            print(f"Tokio mėnesio {sel_men} nėra...")
+            return
+    except ValueError:
+        print("Blogai įvedėte mėnesį arba metus. Turi būti skaičiai.")
+        print("\n\n")
+    key_dt1 = datetime.datetime.strptime(f"{sel_met}-{sel_men}", "%Y-%m")
+    key_dt2 = datetime.datetime.strptime(f"{sel_met}-{sel_men + 1}", "%Y-%m")
+    visi_tm_irasai = sessionx.query(TM_Irasas).filter(TM_Irasas.vardas.ilike(esam_vart.vardas)).filter(
+        TM_Irasas.start_dt >= key_dt1).filter(TM_Irasas.start_dt < key_dt2).all()
+    visi_proj_nr = [pr.proj_nr for pr in visi_tm_irasai]
+    visi_skirtingi_tm_irasai = []
+    # Perrenkam visus įrašus
+    ds_num = calendar.monthrange(sel_met, sel_men)
+    print("\n\n")
+    # unikaliu proj nr. paieska
+    for tm in visi_proj_nr:
+        if tm not in visi_skirtingi_tm_irasai:
+            visi_skirtingi_tm_irasai.append(tm)
+    print(f"{sel_met}m. {sel_men} men.", " ", f"vardas:{esam_vart.vardas}, id={esam_vart.id}")
+    print("-" * 50)
+    # Spausdinimas kiek prie kiekvieno projekto išdirbta
+    projekt_val_l = []
+    for nr in visi_skirtingi_tm_irasai:
+        sumx = []
+        print_obj = None
+        for x in visi_tm_irasai:
+            if x.proj_nr == nr:
+                print_obj = x
+                dt = x.stop_dt - x.start_dt
+                # print(dt)
+                sumx.append((dt.seconds) / 3600)
+        sumx = sum(sumx)
+        if print_obj.proj_nr != "T0001" and print_obj.proj_nr != "T0002":
+            projekt_val_l.append(sumx)
+        tarp1 = "." * (30 - len(print_obj.proj_vardas) - len(str(sumx)))
+        print(print_obj.proj_nr, print_obj.proj_vardas, tarp1, sumx, "val.")
+    print("")
+    txt1 = "Į projektus nurašytos valandos:"
+    tarp1 = "." * (40 - len(txt1) - len(str(sum(projekt_val_l))))
+    print(txt1, tarp1, sum(projekt_val_l), "val.")
+    # Šis menuo turi darbo valandu
+    d_num = calendar.monthrange(sel_met, sel_men)[1]
+    dd = [d for d in range(1, d_num + 1)
+          if datetime.datetime(sel_met, sel_men, d).isoweekday() != 6 and
+          datetime.datetime(sel_met, sel_men, d).isoweekday() != 7]
+    viso_darb_val = len(dd) * 8
+    txt2 = "Bendrosios valandos:"
+    bendrosios_men_val = viso_darb_val - sum(projekt_val_l)
+    tarp2 = "." * (40 - len(txt2) - len(str(bendrosios_men_val)))
+    print(txt2, tarp2, bendrosios_men_val, "val.")
+    txt3 = "Vartotojo apkrovimas:"
+    darb_ur = round((sum(projekt_val_l) / viso_darb_val) * 100, 2)
+    tarp3 = "." * (40 - len(txt3) - len(str(darb_ur)))
+    print(txt3, tarp3, darb_ur, "%")
+    txt4 = f"Viso {sel_men} mėn. turėjo:"
+    tarp4 = "." * (40 - len(txt4) - len(str(round(float(viso_darb_val), 1))))
+    print(txt4, tarp4, round(float(viso_darb_val), 1), "val.")
+    print("\n\n")
+    input("Jei norite testi spauskyte ENTER>>>")
