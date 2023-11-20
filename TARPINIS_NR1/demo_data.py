@@ -2,7 +2,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 import calendar
 import random
-from TARPINIS_NR1.klases.sql_model_tm import NaujasVartotojas, Proj_Irasas, Proj_Islaidos, TM_Irasas, Session
+from sql_model_tm import NaujasVartotojas, Proj_Irasas, Proj_Islaidos, TM_Irasas, Session
 
 
 class MazaDetalizacija:

@@ -1,10 +1,11 @@
 import datetime
 from pathlib import Path
-from klases.sql_model_tm import (engine, Base, default_vartotojai, default_kategorijos, Klasifikacija,
-                                 rodyti_visus_projektus, prisijungti, Proj_Irasas, default_projektai,
-                                 rodyti_proj_detalizacija, tabelio_ataskaita, valandu_ivedimas)
+import os
+from sql_model_tm import (engine, Base, default_vartotojai, default_kategorijos,
+                          rodyti_visus_projektus, prisijungti, Proj_Irasas, default_projektai,
+                          rodyti_proj_detalizacija, tabelio_ataskaita, valandu_ivedimas)
 from sqlalchemy.orm import Session
-from klases.demo_data import (generuoti_vartotojus, kurti_demo_projektus, kurti_demo_detalizacija, kurti_demo_TM_irasus)
+import demo_data as demdat
 
 Base.metadata.create_all(engine)
 session = Session(engine)
@@ -15,11 +16,12 @@ default_kategorijos(session)
 # Defaultiniai projektai
 default_projektai(session)
 # Prisijungimas
-esam_vartotojas=prisijungti(session)
+esam_vartotojas = prisijungti(session)
 print(f"Sveiki prisijungę {esam_vartotojas.vardas} prie programos!")
 # Pagrindinis meniu
 # Tikriname ar yra duombaze
-dbfile = Path(".//db//TM.db")
+cwd = os.getcwd()
+dbfile = Path(cwd + "//db//TM.db")
 visi_proj = session.query(Proj_Irasas).all()
 if len(visi_proj) <= 2:
     print(""
@@ -36,12 +38,12 @@ if len(visi_proj) <= 2:
         test_table = session.query(Proj_Irasas).all()
         if len(test_table) <= 2:
             # Sugeneruojam atsitiktiniu vartotoju
-            generuoti_vartotojus(session)
+            demdat.generuoti_vartotojus(session)
             # Sugeneruojam menamus projektus
-            kurti_demo_projektus(session)
-            kurti_demo_detalizacija(session)
+            demdat.kurti_demo_projektus(session)
+            demdat.kurti_demo_detalizacija(session)
             # Tabeliu užpildymas
-            kurti_demo_TM_irasus(session)
+            demdat.kurti_demo_TM_irasus(session)
 session.commit()
 while True:
     pagr_txt1 = "PAGRINDINIS MENIU"
@@ -51,10 +53,10 @@ while True:
     print("*" * lent_pl + "\n" +
           sonin_lin1 + pagr_txt1 + sonin_lin2 + "\n" +
           "*" * lent_pl + "\n"
-                          "1 - esamų projektų peržiūra\n"
-                          "2 - valandų įvedimas\n"
-                          "3 - tabelių ataskaitos\n"
-                          "q - baigti darbą")
+                          " 1 - esamų projektų peržiūra\n"
+                          " 2 - valandų įvedimas\n"
+                          " 3 - tabelių ataskaitos\n"
+                          " q - baigti darbą")
     sel2 = input("Įveskite pasirinkimą: ")
     if sel2 == "q":
         exit(0)
@@ -64,6 +66,6 @@ while True:
         rodyti_proj_detalizacija(session, rakt)
         input("Jei norite testi spauskite ENTER")
     elif sel2 == "2":
-        valandu_ivedimas(session,esam_vartotojas)
+        valandu_ivedimas(session, esam_vartotojas)
     elif sel2 == "3":
         tabelio_ataskaita(session, esam_vartotojas)

@@ -1,12 +1,14 @@
 import datetime
 import calendar
+import os
 from pathlib import Path
 from sqlalchemy import Column, Integer, String, DateTime, create_engine, ForeignKey, Float
 from sqlalchemy.orm import relationship, Session
 from sqlalchemy.ext.declarative import declarative_base
 
 # Duombazes sukurimas
-db_dir = Path("db")
+cwd=os.getcwd()
+db_dir = Path(cwd+"//db//")
 db_dir.mkdir(parents=True, exist_ok=True)
 Base = declarative_base()
 engine = create_engine("sqlite:///db//TM.db")
@@ -31,7 +33,7 @@ class NaujasVartotojas(Base):
         self.slaptazodis = slaptazodis
 
 
-# Tabelio klases
+# Tabelio klasesAA
 class TM_Irasas(Base):
     """ Tabelio įrašas """
     __tablename__ = "TABELIAI"
