@@ -53,13 +53,13 @@ def generuoti_vartotojus(sessionx: Session):
 def kurti_demo_projektus(sessionx: Session):
     t1 = datetime.datetime(2023, 9, 18)
     t2 = datetime.datetime(2023, 12, 15)
-    proj_01 = Proj_Irasas("T2365", "Vilniaus alėja", "Gatvių apšvietimo automatika", t1, t2, 40_000, "Eur.", 0)
+    proj_01 = Proj_Irasas("T2365", "Vilniaus alėja", "Gatvių apšvietimo automatika", t1, t2, 150_000, "Eur.", 0)
     t1 = datetime.datetime(2023, 2, 3)
     t2 = datetime.datetime(2023, 9, 16)
     proj_02 = Proj_Irasas("T2564", "Nauja statyba", "Gyvenamųjų namų statyba", t1, t2, 2_000_000, "Eur.", 0)
     t1 = datetime.datetime(2020, 5, 3)
     t2 = datetime.datetime(2021, 10, 20)
-    proj_03 = Proj_Irasas("T2003", "Europos parama mokykloms", "Klasės kompiuterių atnaujinimas", t1, t2, 60_000,
+    proj_03 = Proj_Irasas("T2003", "Europos parama mokykloms", "Klasės kompiuterių atnaujinimas", t1, t2, 83_000,
                           "Eur.", 1)
     t1 = datetime.datetime(2022, 11, 20)
     t2 = datetime.datetime(2023, 6, 2)
@@ -73,7 +73,7 @@ def kurti_demo_projektus(sessionx: Session):
     proj_06 = Proj_Irasas("T3569", "Vilniaus Statistika", "SQL duombazės migracija ", t1, t2, 100_000, "Eur.", 0)
     t1 = datetime.datetime(2023, 9, 6)
     t2 = datetime.datetime(2024, 3, 14)
-    proj_07 = Proj_Irasas("T2578", "Telekomunikacija AG", "Interaktyvios televizijos paslaugos", t1, t2, 55_000,
+    proj_07 = Proj_Irasas("T2578", "Telekomunikacija AG", "Interaktyvios televizijos paslaugos", t1, t2, 228_000,
                           "Eur.", 0)
     t1 = datetime.datetime(2023, 12, 2)
     t2 = datetime.datetime(2024, 7, 5)
@@ -181,10 +181,11 @@ def kurti_demo_TM_irasus(sessionx: Session):
                         esam_proj = random.choice(visi_prj)
                         proj_visos_isl = sessionx.query(Proj_Islaidos).filter(
                             Proj_Islaidos.pr_nr.ilike(f"%{esam_proj.pr_nr}%")).all()
-                        proj_visos_isl2 = [isl for isl in proj_visos_isl if len(isl.pr_nr) > 5]
+                        proj_visos_isl2 = [isl for isl in proj_visos_isl if
+                                           len(isl.pr_nr) > 5 and not isl.parent_id is None]
                         esam_proj_kategor = random.choice(proj_visos_isl2)
                         komentaras = random.choice(komentarai)
-                        tm_1 = TM_Irasas(asmuo.id, asmuo.vardas, esam_proj.pr_nr, esam_proj.pr_vardas,
+                        tm_1 = TM_Irasas(asmuo.id, asmuo.vardas, esam_proj_kategor.pr_nr, esam_proj.pr_vardas,
                                          esam_proj_kategor.ded_aprasymas,
                                          start_dt, end_dt, komentaras)
                         visi_irasai.append(tm_1)

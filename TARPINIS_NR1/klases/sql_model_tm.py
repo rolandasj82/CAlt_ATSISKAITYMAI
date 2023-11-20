@@ -183,7 +183,7 @@ def rodyti_visus_projektus(sessionx: Session):
     print("\n")
 
 
-def rodyti_proj_detalizacija(sessionx: Session, raktas=None):
+def rodyti_proj_detalizacija(sessionx: Session, raktas=None, tiksliai=False):
     plot_k = 100
     print()
     uzras_txt = "PROJEKTŲ IŠLAIDŲ DETALIZACIJA"
@@ -193,7 +193,13 @@ def rodyti_proj_detalizacija(sessionx: Session, raktas=None):
     if raktas is None:
         visos_eilutes = sessionx.query(Proj_Islaidos).all()
     else:
-        visos_eilutes = sessionx.query(Proj_Islaidos).filter(Proj_Islaidos.pr_nr.ilike(f"%{raktas}%")).all()
+        if not tiksliai:
+            visos_eilutes = sessionx.query(Proj_Islaidos).filter(Proj_Islaidos.pr_nr.ilike(f"%{raktas}%")).all()
+        else:
+            visos_eilutes = sessionx.query(Proj_Islaidos).filter(Proj_Islaidos.pr_nr.ilike(f"{raktas}%")).all()
+            if len(visos_eilutes) == 0:
+                print(f"Projekto nr.:{raktas} nerastas. Pasitikrinkite ar teisingai įvedėte projekto nr.? ")
+                return
 
     kof1 = 65
     kof2 = 8
@@ -281,8 +287,8 @@ def tabelio_ataskaita(sessionx: Session, esam_vart: NaujasVartotojas = None):
     for tm in visi_proj_nr:
         if tm not in visi_skirtingi_tm_irasai:
             visi_skirtingi_tm_irasai.append(tm)
-    print(f"{sel_met}m. {sel_men} men.", " ", f"vardas:{esam_vart.vardas}, id={esam_vart.id}")
-    print("-" * 50)
+    print(f"{sel_met}m. {sel_men} men.", " "*60, f"vardas:{esam_vart.vardas}, id={esam_vart.id}")
+    print("-" * 100)
     # Spausdinimas kiek prie kiekvieno projekto išdirbta
     projekt_val_l = []
     for nr in visi_skirtingi_tm_irasai:
@@ -297,12 +303,13 @@ def tabelio_ataskaita(sessionx: Session, esam_vart: NaujasVartotojas = None):
         sumx = sum(sumx)
         if print_obj.proj_nr != "T0001" and print_obj.proj_nr != "T0002":
             projekt_val_l.append(sumx)
-        tarp1 = "." * (30 - len(print_obj.proj_vardas) - len(str(sumx)))
-        print(print_obj.proj_nr, print_obj.proj_vardas, tarp1, sumx, "val.")
+        tarp1 = "." * (50 - len(print_obj.darb_kat))
+        tarp1_1 = " " * (26 - len(print_obj.proj_vardas))
+        print(print_obj.proj_nr, print_obj.proj_vardas, tarp1_1, print_obj.darb_kat, tarp1, round(sumx,1), "val.")
     print("")
     txt1 = "Į projektus nurašytos valandos:"
-    tarp1 = "." * (40 - len(txt1) - len(str(sum(projekt_val_l))))
-    print(txt1, tarp1, sum(projekt_val_l), "val.")
+    tarp1 = "." * (50 - len(txt1) - len(str(round(sum(projekt_val_l),1))))
+    print(txt1, tarp1, round(sum(projekt_val_l),1), "val.")
     # Šis menuo turi darbo valandu
     d_num = calendar.monthrange(sel_met, sel_men)[1]
     dd = [d for d in range(1, d_num + 1)
@@ -311,14 +318,54 @@ def tabelio_ataskaita(sessionx: Session, esam_vart: NaujasVartotojas = None):
     viso_darb_val = len(dd) * 8
     txt2 = "Bendrosios valandos:"
     bendrosios_men_val = viso_darb_val - sum(projekt_val_l)
-    tarp2 = "." * (40 - len(txt2) - len(str(bendrosios_men_val)))
-    print(txt2, tarp2, bendrosios_men_val, "val.")
+    tarp2 = "." * (50 - len(txt2) - len(str(round(bendrosios_men_val,1))))
+    print(txt2, tarp2, round(bendrosios_men_val,1), "val.")
     txt3 = "Vartotojo apkrovimas:"
     darb_ur = round((sum(projekt_val_l) / viso_darb_val) * 100, 2)
-    tarp3 = "." * (40 - len(txt3) - len(str(darb_ur)))
+    tarp3 = "." * (50 - len(txt3) - len(str(darb_ur)))
     print(txt3, tarp3, darb_ur, "%")
-    txt4 = f"Viso {sel_men} mėn. turėjo:"
-    tarp4 = "." * (40 - len(txt4) - len(str(round(float(viso_darb_val), 1))))
+    txt4 = f"Viso {sel_men} mėn. turėjo darbo valandų:"
+    tarp4 = "." * (50 - len(txt4) - len(str(round(float(viso_darb_val), 1))))
     print(txt4, tarp4, round(float(viso_darb_val), 1), "val.")
     print("\n\n")
     input("Jei norite testi spauskyte ENTER>>>")
+
+
+def valandu_ivedimas(sessionx: Session, esam_vart: NaujasVartotojas):
+    print("\n")
+    print("*********** VALANDŲ VEDIMAS **************************:")
+    rodyti_visus_projektus(sessionx)
+    rakt = input("Pasirinkite projektą iš sarašo, pagal PROJEKTO NR.")
+    root_pr_obj = sessionx.query(Proj_Irasas).filter(Proj_Irasas.pr_nr == rakt).first()
+    print("AAAA", root_pr_obj.pr_vardas)
+    rodyti_proj_detalizacija(sessionx, rakt, tiksliai=True)
+    # Projekto išrinkimas
+    while True:
+        proj_ded_nr = input("Pasirinkite projekto dedamąją iš sarašo, pagal PROJEKTO NR.: ")
+        try:
+            isld_obj = sessionx.query(Proj_Islaidos).filter(Proj_Islaidos.pr_nr == proj_ded_nr).first()
+            print("Projekto eilutė: '", isld_obj.pr_nr, " ", isld_obj.ded_aprasymas, "' rasta")
+            if not "_" in isld_obj.pr_nr:
+                print(f"Toks projektas '{isld_obj.pr_nr}' yra, bet blogai nurodėte jo detalizaciją...")
+                continue
+            break
+        except:
+            print("Tokio projekto nėra...")
+    # Laiku sudeliojimas:
+    while True:
+        start_dt = input("Iveskite datą ir laiką, kada pradėjote darbus (yyyy-mm-dd HH:MM):")
+        stop_dt = input("Iveskite datą ir laiką, kada baigėte darbus (yyyy-mm-dd HH:MM):")
+        try:
+            start_dt = datetime.datetime.strptime(start_dt, "%Y-%m-%d %H:%M")
+            stop_dt = datetime.datetime.strptime(stop_dt, "%Y-%m-%d %H:%M")
+            break
+        except:
+            print("Blogai įvedėte laiką!")
+            continue
+
+    komentaras = input("Įveskite eilutės komentarą:")
+    tm_obj = TM_Irasas(esam_vart.id, esam_vart.vardas, isld_obj.pr_nr, root_pr_obj.pr_vardas, isld_obj.ded_aprasymas,
+                       start_dt, stop_dt, komentaras)
+    sessionx.add(tm_obj)
+    sessionx.commit()
+    print("\n\n")

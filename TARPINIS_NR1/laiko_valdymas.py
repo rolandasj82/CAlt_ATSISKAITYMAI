@@ -2,7 +2,7 @@ import datetime
 from pathlib import Path
 from klases.sql_model_tm import (engine, Base, default_vartotojai, default_kategorijos, Klasifikacija,
                                  rodyti_visus_projektus, prisijungti, Proj_Irasas, default_projektai,
-                                 rodyti_proj_detalizacija, tabelio_ataskaita)
+                                 rodyti_proj_detalizacija, tabelio_ataskaita, valandu_ivedimas)
 from sqlalchemy.orm import Session
 from klases.demo_data import (generuoti_vartotojus, kurti_demo_projektus, kurti_demo_detalizacija, kurti_demo_TM_irasus)
 
@@ -63,8 +63,7 @@ while True:
         rakt = input("Įveskite projekto NR., jie norite peržiurėti projekto detalizaciją: ")
         rodyti_proj_detalizacija(session, rakt)
         input("Jei norite testi spauskite ENTER")
-    elif sel2=="2":
-        pass
-    elif sel2=="3":
-        tabelio_ataskaita(session,esam_vartotojas)
-
+    elif sel2 == "2":
+        valandu_ivedimas(session,esam_vartotojas)
+    elif sel2 == "3":
+        tabelio_ataskaita(session, esam_vartotojas)
