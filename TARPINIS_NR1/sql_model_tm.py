@@ -101,9 +101,9 @@ class Proj_Islaidos(Base):
     __tablename__ = 'PROJ_ISLAIDOS'
     id = Column(Integer, primary_key=True)
     pr_nr = Column(String)
-    ded_aprasymas = Column(String)
-    ded_verte = Column(Float)
-    ded_valiuta = Column(String)
+    det_aprasymas = Column(String)
+    det_verte = Column(Float)
+    det_valiuta = Column(String)
     pr_ivest_data_utc = Column(DateTime, default=datetime.datetime.utcnow)
     parent_id = Column(Integer, ForeignKey('PROJ_ISLAIDOS.id'))
     parent = relationship("Proj_Islaidos", back_populates="children", remote_side=[id])  #
@@ -111,9 +111,9 @@ class Proj_Islaidos(Base):
 
     def __init__(self, pr_nr, ded_aprasymas, ded_verte, parent=None, ded_valiuta="Eur."):
         self.pr_nr = pr_nr
-        self.ded_aprasymas = ded_aprasymas
-        self.ded_verte = ded_verte
-        self.ded_valiuta = ded_valiuta
+        self.det_aprasymas = ded_aprasymas
+        self.det_verte = ded_verte
+        self.det_valiuta = ded_valiuta
         self.parent = parent
 
 
@@ -210,23 +210,23 @@ def rodyti_proj_detalizacija(sessionx: Session, raktas=None, tiksliai=False):
     for r in visos_eilutes:
         detalizac_sum = 0
         if r.parent_id is None:
-            tarp1 = "." * (kof1 - len(r.ded_aprasymas) + 6) + " suma:"
-            tarp2 = " " * (kof2 - len(str(r.ded_verte)))
-            print("", r.pr_nr, r.ded_aprasymas, tarp1, r.ded_verte, tarp2, r.ded_valiuta)
+            tarp1 = "." * (kof1 - len(r.det_aprasymas) + 6) + " suma:"
+            tarp2 = " " * (kof2 - len(str(r.det_verte)))
+            print("", r.pr_nr, r.det_aprasymas, tarp1, r.det_verte, tarp2, r.det_valiuta)
             print("-" * plot_k)
             for l1 in visos_eilutes:
                 if l1.parent_id == r.id and r.parent_id is None:
-                    tarp1 = "." * (kof1 - len(l1.ded_aprasymas) + 2)
-                    tarp2 = " " * (kof2 - len(str(l1.ded_verte)) + 4)
-                    print(" -", l1.pr_nr, l1.ded_aprasymas, tarp1, l1.ded_verte, tarp2, l1.ded_valiuta)
+                    tarp1 = "." * (kof1 - len(l1.det_aprasymas) + 2)
+                    tarp2 = " " * (kof2 - len(str(l1.det_verte)) + 4)
+                    print(" -", l1.pr_nr, l1.det_aprasymas, tarp1, l1.det_verte, tarp2, l1.det_valiuta)
                     for l2 in visos_eilutes:
                         if l2.parent_id == l1.id and l1.parent_id == r.id and r.parent_id is None:
-                            detalizac_sum += l2.ded_verte
-                            tarp1 = "." * (kof1 - len(l2.ded_aprasymas))
-                            tarp2 = " " * (kof2 - len(str(l2.ded_verte)) + 2)
-                            print("     -", l2.pr_nr, l2.ded_aprasymas, tarp1, l2.ded_verte, tarp2, l2.ded_valiuta)
+                            detalizac_sum += l2.det_verte
+                            tarp1 = "." * (kof1 - len(l2.det_aprasymas))
+                            tarp2 = " " * (kof2 - len(str(l2.det_verte)) + 2)
+                            print("     -", l2.pr_nr, l2.det_aprasymas, tarp1, l2.det_verte, tarp2, l2.det_valiuta)
             sum_msg1 = f"Detalizacijos suma :{detalizac_sum} Eur."
-            sum_msg2 = f"Balansas :{r.ded_verte - detalizac_sum} Eur."
+            sum_msg2 = f"Balansas :{r.det_verte - detalizac_sum} Eur."
             print("\n", " " * (plot_k - len(sum_msg1)) + sum_msg1)
             print(" " * (plot_k - len(sum_msg2)) + sum_msg2)
             print("\n\n", "-" * plot_k)
@@ -346,7 +346,7 @@ def valandu_ivedimas(sessionx: Session, esam_vart: NaujasVartotojas):
         proj_ded_nr = input("Pasirinkite projekto dedamąją iš sarašo, pagal PROJEKTO NR.: ")
         try:
             isld_obj = sessionx.query(Proj_Islaidos).filter(Proj_Islaidos.pr_nr == proj_ded_nr).first()
-            print("Projekto eilutė: '", isld_obj.pr_nr, " ", isld_obj.ded_aprasymas, "' rasta")
+            print("Projekto eilutė: '", isld_obj.pr_nr, " ", isld_obj.det_aprasymas, "' rasta")
             if not "_" in isld_obj.pr_nr:
                 print(f"Toks projektas '{isld_obj.pr_nr}' yra, bet blogai nurodėte jo detalizaciją...")
                 continue
@@ -366,7 +366,7 @@ def valandu_ivedimas(sessionx: Session, esam_vart: NaujasVartotojas):
             continue
 
     komentaras = input("Įveskite eilutės komentarą:")
-    tm_obj = TM_Irasas(esam_vart.id, esam_vart.vardas, isld_obj.pr_nr, root_pr_obj.pr_vardas, isld_obj.ded_aprasymas,
+    tm_obj = TM_Irasas(esam_vart.id, esam_vart.vardas, isld_obj.pr_nr, root_pr_obj.pr_vardas, isld_obj.det_aprasymas,
                        start_dt, stop_dt, komentaras)
     sessionx.add(tm_obj)
     sessionx.commit()

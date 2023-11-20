@@ -35,7 +35,7 @@ class MazaDetalizacija:
                 except TypeError:
                     pass
 
-            p_x0x.ded_verte = ded_sum
+            p_x0x.det_verte = ded_sum
             k += 1
         self.sessionx.add_all(prj_medis)
 
@@ -186,7 +186,7 @@ def kurti_demo_TM_irasus(sessionx: Session):
                         esam_proj_kategor = random.choice(proj_visos_isl2)
                         komentaras = random.choice(komentarai)
                         tm_1 = TM_Irasas(asmuo.id, asmuo.vardas, esam_proj_kategor.pr_nr, esam_proj.pr_vardas,
-                                         esam_proj_kategor.ded_aprasymas,
+                                         esam_proj_kategor.det_aprasymas,
                                          start_dt, end_dt, komentaras)
                         visi_irasai.append(tm_1)
     sessionx.add_all(visi_irasai)

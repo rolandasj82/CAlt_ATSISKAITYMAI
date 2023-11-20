@@ -62,7 +62,7 @@ while True:
         exit(0)
     if sel2 == "1":
         rodyti_visus_projektus(session)
-        rakt = input("Įveskite projekto NR., jie norite peržiurėti projekto detalizaciją: ")
+        rakt = input("Įveskite projekto NR., jei norite peržiurėti projekto detalizaciją: ")
         rodyti_proj_detalizacija(session, rakt)
         input("Jei norite testi spauskite ENTER")
     elif sel2 == "2":
