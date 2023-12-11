@@ -7,18 +7,12 @@ from sqlalchemy.orm import relationship, Session
 from sqlalchemy.ext.declarative import declarative_base
 
 # Duombazes sukurimas
-cwd=os.getcwd()
-db_dir = Path(cwd+"//db//")
+cwd = os.getcwd()
+db_dir = Path(cwd + "//db//")
 db_dir.mkdir(parents=True, exist_ok=True)
 Base = declarative_base()
 engine = create_engine("sqlite:///db//TM.db")
 Base.metadata.create_all(engine)
-
-
-# class Vartotojas:
-#     def __init__(self, vardas, slaptazodis):
-#         self.vardas = vardas
-#         self.slaptazodis = slaptazodis
 
 
 class NaujasVartotojas(Base):
@@ -289,7 +283,7 @@ def tabelio_ataskaita(sessionx: Session, esam_vart: NaujasVartotojas = None):
     for tm in visi_proj_nr:
         if tm not in visi_skirtingi_tm_irasai:
             visi_skirtingi_tm_irasai.append(tm)
-    print(f"{sel_met}m. {sel_men} men.", " "*60, f"vardas:{esam_vart.vardas}, id={esam_vart.id}")
+    print(f"{sel_met}m. {sel_men} men.", " " * 60, f"vardas:{esam_vart.vardas}, id={esam_vart.id}")
     print("-" * 100)
     # Spausdinimas kiek prie kiekvieno projekto išdirbta
     projekt_val_l = []
@@ -307,11 +301,11 @@ def tabelio_ataskaita(sessionx: Session, esam_vart: NaujasVartotojas = None):
             projekt_val_l.append(sumx)
         tarp1 = "." * (50 - len(print_obj.darb_kat))
         tarp1_1 = " " * (26 - len(print_obj.proj_vardas))
-        print(print_obj.proj_nr, print_obj.proj_vardas, tarp1_1, print_obj.darb_kat, tarp1, round(sumx,1), "val.")
+        print(print_obj.proj_nr, print_obj.proj_vardas, tarp1_1, print_obj.darb_kat, tarp1, round(sumx, 1), "val.")
     print("")
     txt1 = "Į projektus nurašytos valandos:"
-    tarp1 = "." * (50 - len(txt1) - len(str(round(sum(projekt_val_l),1))))
-    print(txt1, tarp1, round(sum(projekt_val_l),1), "val.")
+    tarp1 = "." * (50 - len(txt1) - len(str(round(sum(projekt_val_l), 1))))
+    print(txt1, tarp1, round(sum(projekt_val_l), 1), "val.")
     # Šis menuo turi darbo valandu
     d_num = calendar.monthrange(sel_met, sel_men)[1]
     dd = [d for d in range(1, d_num + 1)
@@ -320,8 +314,8 @@ def tabelio_ataskaita(sessionx: Session, esam_vart: NaujasVartotojas = None):
     viso_darb_val = len(dd) * 8
     txt2 = "Bendrosios valandos:"
     bendrosios_men_val = viso_darb_val - sum(projekt_val_l)
-    tarp2 = "." * (50 - len(txt2) - len(str(round(bendrosios_men_val,1))))
-    print(txt2, tarp2, round(bendrosios_men_val,1), "val.")
+    tarp2 = "." * (50 - len(txt2) - len(str(round(bendrosios_men_val, 1))))
+    print(txt2, tarp2, round(bendrosios_men_val, 1), "val.")
     txt3 = "Vartotojo apkrovimas:"
     darb_ur = round((sum(projekt_val_l) / viso_darb_val) * 100, 2)
     tarp3 = "." * (50 - len(txt3) - len(str(darb_ur)))
