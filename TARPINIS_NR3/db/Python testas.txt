@@ -1,0 +1,144 @@
+##|Python testas 1 lygis
+@@|Kokia yra teisinga Python sintaksė išvesti pranešimą "Hello World"?
+[]|echo("Hello World");|0.0
+[]|print("Hello World")|1.0
+[]|echo "Hello World"|0.0
+[]|p("Hello World")|0.0
+
+@@|Kaip žymimi komentarai Python'e?
+[]|#tai yra koemntaras|1.0
+[]|/* tai yra komentaras*/|0.0
+[]|//tai yra komentaras|0.0
+
+@@|Kuris yra neteisingas kintamojo vardas?
+[]|Myvar|0.0
+[]|my_var|0.0
+[]|my-var|1.0
+[]|_myvar|0.0
+
+@@|Kaip sukurti kintamąjį su verte 5?
+[]|Abu atsakymai teisingi|1.0
+[]|x=int(5)|0.0
+[]|x=5|0.0
+
+@@|Kuris yra teisingas Python failų plėtinys?
+[]|.pyth|0.0
+[]|.py|1.0
+[]|.pt|0.0
+[]|.pyt|0.0
+
+@@|Kaip sukurti kintamajį su float verte 2.8?
+[]|x=2.8|0.0
+[]|Abu atsakymai teisingi|1.0
+[]|x=flaot(2.8)|0.0
+
+@@|Kuri yra teisinga sintaksė norint sužinoti kintamojo arba objekto tipą?
+[]|print(type(x))|1.0
+[]|print(typeeof(x))|0.0
+[]|print(typeOf(x))|0.0
+[]|print(typeof x)|0.0
+
+@@|Kaip teisingai sukurti funkciją Python'e?
+[]|create myFunction():|0.0
+[]|def myFunction():|1.0
+[]|function myfunction():|0.0
+
+@@|Ar Python'e 'Hello' yra taspats kas "Hello"?
+[]|Taip|1.0
+[]|Ne|0.0
+
+@@|Kuri yra teisinga sintaksė norint išrinkti pirmą simbolį?
+[]|x="Hello".sub(0,1)|0.0
+[]|x="Hello"[0]|1.0
+[]|x=sub("Hello",0,1)|0.0
+
+@@|Kuris metodas panaikina tuščius tarpus "string" priekyje ir gale?
+[]|strip()|1.0
+[]|len()|0.0
+[]|trim()|0.0
+[]|ptrim()|0.0
+
+@@|Kuris metodas naudojamas iš stringo simbolius gražinti didžiosiomis raidėmis?
+[]|toUpperCase()|0.0
+[]|upper()|1.0
+[]|upperCase()|0.0
+[]|uppercase()|0.0
+
+@@|Kuris metodas naudojams pakeisti dalį stringo?
+[]|repl()|0.0
+[]|switch()|0.0
+[]|replace()|1.0
+[]|replaceString()|0.0
+
+@@|Kuris operatorius naudojamas norint sudauginti skaičius?
+[]|%|0.0
+[]|#|0.0
+[]|*|1.0
+[]|x|0.0
+
+@@|Kuris operatorius gali būti naudojamas palyginti dvi vertes?
+[]|==|1.0
+[]|><|0.0
+[]|=|0.0
+[]|<>|0.0
+
+@@|Kuris iš aprašymų apibūdina sąrašą (LIST)?
+[]|("obuolys", "bananas", "vyšnia")|0.0
+[]|["obuolys", "bananas", "vyšnia"]|1.0
+[]|{"vardas":"obuolys", "spalva":"žalia"}|0.0
+[]|{"obuolys", "bananas", "vyšnia"}|0.0
+
+@@|Kuris iš aprašymų apibūdina TUPLE?
+[]|("obuolys", "bananas", "vyšnia")|1.0
+[]|["obuolys", "bananas", "vyšnia"]|0.0
+[]|{"vardas":"obuolys", "spalva":"žalia"}|0.0
+[]|{"obuolys", "bananas", "vyšnia"}|0.0
+
+@@|Kuris iš aprašymų apibūdina SET?
+[]|("obuolys", "bananas", "vyšnia")|0.0
+[]|["obuolys", "bananas", "vyšnia"]|0.0
+[]|{"vardas":"obuolys", "spalva":"žalia"}|0.0
+[]|{"obuolys", "bananas", "vyšnia"}|1.0
+
+@@|Kuris iš aprašymų apibūdina DICTIONARY?
+[]|("obuolys", "bananas", "vyšnia")|0.0
+[]|["obuolys", "bananas", "vyšnia"]|0.0
+[]|{"vardas":"obuolys", "spalva":"žalia"}|1.0
+[]|{"obuolys", "bananas", "vyšnia"}|0.0
+
+@@|Kuris iš rinkinių gali būti rikiuojamas, keisti vertes ir leidžia dubliuoti vienodas vertes?
+[]|TUPLE|0.0
+[]|DICTIONARY|0.0
+[]|SET|0.0
+[]|LIST|1.0
+
+@@|Kuris rinkinys iš sąrašo neleidžia dubliuoti narių?
+[]|TUPLE|0.0
+[]|LIST|0.0
+[]|SET|1.0
+
+@@|Kaip pradėti rašyti IF salygą Python kalboje?
+[]|if x>y then:|0.0
+[]|if x>y:|1.0
+[]|if (x>y)|0.0
+
+@@|Kaip pradėti rašyti WHILE ciklą Python kalboje?
+[]|x>y while{|0.0
+[]|while (x>y)|0.0
+[]|while x>y:|1.0
+[]|while x>y{|0.0
+
+@@|Kaip pradėti rašyti FOR ciklą Python kalboje?
+[]|for x>y:|0.0
+[]|for each x in y:|0.0
+[]|for x in y:|1.0
+
+@@|Kuri komanda sustabdo ciklą?
+[]|exit|0.0
+[]|breack|1.0
+[]|stop|0.0
+[]|return|0.0
+
+
+
+

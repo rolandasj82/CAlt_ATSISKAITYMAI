@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import requests
 
 
-
 class PasaulioTemper:
     def __init__(self, master):
         self.HOST = "https://api-temperaturos.run-eu-central1.goorm.site"
@@ -89,11 +88,6 @@ class PasaulioTemper:
         self.li_ilg_v.grid(row=i_pos[0] + 5, column=i_pos[1] + 1, sticky=tk.W)
         self.li_ilg_v.config(font=self.txt_font12, bg=self.infe_bcolor)
 
-        # self.li_api = tk.Label(master, text=self.HOST, bg=self.fonosp, font=self.txt_font10i, width=60)
-        # self.li_api.grid(row=i_pos[0]+6, column=0, sticky=tk.E)
-        # self.li_api = tk.Label(master, text=self.HOST, bg=self.fonosp, font=self.txt_font10i, width=18, height=3)
-        # self.li_api.grid(row=i_pos[0]+6, column=0, sticky=tk.E, padx=0, pady=10)
-
     def status_infoe(self, stat="normal"):
         self.li_miestas_v.config(state=stat)
         self.li_salis_v.configure(state=stat)
@@ -103,7 +97,6 @@ class PasaulioTemper:
         self.li_ilg_v.config(state=stat)
 
     def na_values(self):
-        #self.status_infoe("normal")
         self.li_miestas_v.insert(0, "n/a")
         self.li_salis_v.insert(0, "n/a")
         self.li_sk_v.insert(0, "n/a")
@@ -119,7 +112,6 @@ class PasaulioTemper:
         self.li_gyvent_v.delete(0, "end")
         self.li_plat_v.delete(0, "end")
         self.li_ilg_v.delete(0, "end")
-
 
         self.miestas = self.e_miestas.get()
         self.start = self.e_start.get()
@@ -161,7 +153,7 @@ class PasaulioTemper:
         else:
             self.na_values()
 
-# ------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------
 
     def draw_plot(self):
         x = self.r_datos
