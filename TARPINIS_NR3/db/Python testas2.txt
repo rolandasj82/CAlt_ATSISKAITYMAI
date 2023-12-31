@@ -1,0 +1,21 @@
+##|Python testas 2 lygis (trumpas)
+@@|Kokia yra teisinga Python sintaksė išvesti pranešimą "Hello World"?
+[]|echo("Hello World");|0.0
+[]|print("Hello World")|2.0
+[]|echo "Hello World"|0.0
+[]|p("Hello World")|0.0
+
+@@|Kaip žymimi komentarai Python'e?
+[]|#tai yra koemntaras|1.0
+[]|/* tai yra komentaras*/|0.0
+[]|//tai yra komentaras|0.0
+
+@@|Kuris yra neteisingas kintamojo vardas?
+[]|Myvar|0.0
+[]|my_var|0.0
+[]|my-var|1.0
+[]|_myvar|0.0
+
+
+
+

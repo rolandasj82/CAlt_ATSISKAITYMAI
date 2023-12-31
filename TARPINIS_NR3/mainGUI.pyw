@@ -31,11 +31,11 @@ class MainWindows:
         self.prisijung_ses = None
         self.sql_temos = None
         self.temos_df = None
-        self.orm_vart_atsakymu_istor = None
-        self.df_vart_atsakymu_istor = None
-        self.vart_atsakymu_istor = None
+        self._orm_sesiju_sarasas_pagal_vartot = None
+        self._sesiju_sar_df = None
         self.fr_temu_istor = None
-        self.klaus_istor_z = {}
+        self._istorija_sess_id = None
+        self._istorija_klausimu_pagal_temid = None
         self.istorija_index01 = 0
         self._kl_index = 0
         self._kl_kiekis = 0
@@ -123,7 +123,7 @@ class MainWindows:
         self.fr_meniu = tk.Frame(self.master)
         self.fr_meniu.pack(expand=True)
         btn_atlikti = MButton01(self.fr_meniu, text="Peržiūreti atliktus testus",
-                                command=self.perziureti_atliktus_testus, width=30)
+                                command=self.btnf_atliktu_test_sess_sarasas, width=30)
         btn_temos = MButton01(self.fr_meniu, text="Rinktis temą", command=self.temusar, width=30)
         btn_atsijungti = MButton01(self.fr_meniu, text="Atsijungti", command=self.atjungti_sesija)
         btn_iseiti = MButton01(self.fr_meniu, text="Išeiti", command=self.exit_wind)
@@ -132,110 +132,78 @@ class MainWindows:
         btn_atsijungti.pack(fill=tk.X)
         btn_iseiti.pack(fill=tk.X)
 
-    def perziureti_atliktus_testus(self):
-        self.orm_vart_atsakymu_istor = orm_atlikti_testai(self.prisijung_ses[1])
-        self.df_vart_atsakymu_istor = []
-        for vart, ses, vats, ats, kl, tem in self.orm_vart_atsakymu_istor:
-            # 0.v.id 1.vardas 2.ses.id 3.tem.id 4.tem.pavadin 5.kl.id 6.kl.pavadin 7atsakym[]
-            self.df_vart_atsakymu_istor.append([vart.id, vart.vardas, ses.id, tem.id, tem.pavadinimas,
-                                                kl.id, kl.pavadinimas,
-                                                [ats.id, ats.vardas, ats.balas, vats.atsakymas_id]])
+    def btnf_atliktu_test_sess_sarasas(self):
+        self._orm_sesiju_sarasas_pagal_vartot = orm_sesiju_istorija_pagal_vart_id(self.prisijung_ses[1].id)
+        self._sesiju_sar_df = []
+        #  # 0-sesid, 1-temid, 2-tempav
+        for ses in self._orm_sesiju_sarasas_pagal_vartot:
+            temp = f"{str(ses[0])}|{ses[2]}"
+            self._sesiju_sar_df.append(temp)
         self.fr_meniu.destroy()
-        self.istorija_temu()
+        self.sesiju_istorija()
 
-    def istorija_temu(self):
+    def sesiju_istorija(self):
         self.fr_temu_istor = tk.Frame(self.master)
         self.fr_temu_istor.pack(expand=True)
         self.listBox = tk.Listbox(self.fr_temu_istor, width=50, height=20, font=("Courier New", 12))
         self.listBox.pack()
-        btn_perziuret = MButton01(self.fr_temu_istor, text="Peržiūrėti", command=self.istorija_klausimu)
+        btn_perziuret = MButton01(self.fr_temu_istor, text="Peržiūrėti", command=self.btnf_perziureti_ses_istorija)
         btn_perziuret.pack(fill=tk.X)
         btn_gryzt = MButton01(self.fr_temu_istor, text="Grįžti", command=self.mainmeniu)
         btn_gryzt.pack(fill=tk.X)
-        temos_l = []
-        for el1 in self.df_vart_atsakymu_istor:
-            temp_tema = str(el1[2]) + "||" + el1[4]
-            if temp_tema not in temos_l:
-                temos_l.append(temp_tema)
-        for tem2 in temos_l:
-            str1 = tem2.split("||")
-            self.listBox.insert(tk.END, f'{str1[0]}|' + str1[1])
+        for tem2 in self._sesiju_sar_df:
+            self.listBox.insert(tk.END, tem2)
 
-    def istorija_klausimu(self):
-        """ tema[0]=id, tema[1]=pavadinimas"""
-        isrinkta = self.listBox.selection_get().split("|")
-        klausimai_l = []
-        klausid_l = []
-        self.klaus_istor_z = {}
-        atsid_l = []
-        atsak_l = []
-        for el in self.df_vart_atsakymu_istor:
-            if int(isrinkta[0]) == el[2]:
-                if el[5] not in klausid_l:
-                    atsak_l = []
-                    klausid_l.append(el[5])
-                    klausimai_l.append(el[6])
-                    atsak_l.append(
-                        [el[7][0], el[7][1], el[7][2], el[7][3]])  # ats.id, ats.vardas, ats.balas, vartot.ats_id
-                    atsid_l.append(el[7][1])
-                    r = str(el[5]) + "||" + el[6]
-                    self.klaus_istor_z.update({r: atsak_l})
-                else:
-                    atsak_l.append([el[7][1], el[7][2]])
-                    atsid_l.append(el[7][1])
-                    r = str(el[5]) + "||" + el[6]
-                self.klaus_istor_z.update({r: atsak_l})
-
+    def btnf_perziureti_ses_istorija(self):
+        self._istorija_sess_id = self.listBox.selection_get().split("|")[0]
+        for s in self._orm_sesiju_sarasas_pagal_vartot:
+            if str(s[0]) == self._istorija_sess_id:
+                self._istorija_klausimu_pagal_temid = orm_visi_klausimai_pagal_temos_id(str(s[1]))
+                break
         self.istorija_index01 = 0
-        self.istorija_naujas_klausimo_langas(self.istorija_index01, self.klaus_istor_z)
+        self.istorija_naujas_klausimo_langas(self.istorija_index01)
+        pass
 
-    def istorija_naujas_klausimo_langas(self, index, klaus_z):
+    def istorija_naujas_klausimo_langas(self, index):
         self.master.geometry(self.__geometry02)
         if self.fr_klausimo_istor is not None:
             self.fr_klausimo_istor.destroy()
-        tem_klausimai = list(klaus_z.keys())
-        if index >= len(tem_klausimai):
+        if index >= len(list(self._istorija_klausimu_pagal_temid.keys())):
             self.master.geometry(self.__geometry01)
-            self.istorija_temu()
+            self.sesiju_istorija()
             return
-        atss = orm_gauti_atsakymus_pagal_klid(tem_klausimai[index].split("||")[0])
+        visi_kl = list(self._istorija_klausimu_pagal_temid.keys())
+        atsakymai_pagal_kl = self._istorija_klausimu_pagal_temid.get(visi_kl[index])
         self.fr_temu_istor.destroy()
         self.fr_klausimo_istor = tk.Frame(self.master)
-        self.fr_klausimo_istor.pack(expand=True)#grid(row=0, column=0, pady=10, sticky=tk.S)
-        temp_kl = f"{self.istorija_index01 + 1}. " + tem_klausimai[index].split("||")[1]
-        l_klausim01 = MLable01(self.fr_klausimo_istor, text=temp_kl)
+        self.fr_klausimo_istor.pack(expand=True)  # grid(row=0, column=0, pady=10, sticky=tk.S)
+        kl_str = f"{index + 1}. {visi_kl[index].split('||')[1]}"
+        l_klausim01 = MLable01(self.fr_klausimo_istor, text=kl_str)
         l_klausim01.grid(row=0, column=0, pady=10, sticky="ew")
-        i = 1
-        offsx = 0
-        for i, ats_x in enumerate(atss, 1):
-            cbxname = f"ats_{i + offsx - 1}"
-            vcbxname = f"kint_{i + offsx - 1}"
-
+        i = 0
+        for i, ats in enumerate(atsakymai_pagal_kl, 0):
+            visi_vart_ses_atsakym = orm_visi_vartot_atsakym_pagal_ses_id(self._istorija_sess_id)
+            cbxname = f"ats_{i}"
+            vcbxname = f"kint_{i}"
             bool_var = globals()[vcbxname] = tk.BooleanVar(name=vcbxname)
             bool_var.set(False)
-            globals()[cbxname] = MCheckbutton01(self.fr_klausimo_istor, text=ats_x[1],
+            globals()[cbxname] = MCheckbutton01(self.fr_klausimo_istor, text=ats[1],
                                                 variable=bool_var, name=cbxname)
             cbtnx = globals()[cbxname]
             cbtnx["state"] = "disabled"
-            vart_ats = klaus_z.get(tem_klausimai[index])
-            print("vart_ats", vart_ats)
-            print("ats_x", ats_x)
-            if vart_ats[0][0] == ats_x[0]:
-                bool_var.set(True)
-                cbtnx.configure(style="blogas.TCheckbutton")
-
-            if ats_x[2] > 0.0:
+            for vax in visi_vart_ses_atsakym:
+                if ats[0] == vax[1]:
+                    bool_var.set(True)
+                    cbtnx.configure(style="blogas.TCheckbutton")
+            if ats[2] > 0:
                 cbtnx.configure(style="teisingas.TCheckbutton")
-
-            cbtnx.grid(row=i, column=0, pady=10, sticky="ew")
-            offsx == 50
-
+            cbtnx.grid(row=i + 1, column=0, pady=10, sticky="ew")
         btn_klausim01 = MButton01(self.fr_klausimo_istor, text="Sekantis klausimas", command=self.istorija_kitas)
-        btn_klausim01.grid(row=i + 1, column=0, pady=10, sticky="S")
+        btn_klausim01.grid(row=i + 2, column=0, pady=10, sticky="S")
 
     def istorija_kitas(self):
         self.istorija_index01 += 1
-        self.istorija_naujas_klausimo_langas(self.istorija_index01, self.klaus_istor_z)
+        self.istorija_naujas_klausimo_langas(self.istorija_index01)
 
     def atjungti_sesija(self):
         self.fr_meniu.destroy()
@@ -370,11 +338,11 @@ class MainWindows:
         for rakt in df.keys():
             atsx_l = df.get(rakt)
             for atsx in atsx_l:
-                ats_obj = orm_gauti_atsakyma(ats_id=atsx[0])
-                orm_vartotoj_atsakym(testo_ses=self.s, atsakymas_o=ats_obj)
-                # if atsx[3] > 0:
-                #     ats_obj = orm_gauti_atsakyma(ats_id=atsx[0])
-                #     orm_vartotoj_atsakym(testo_ses=self.s, atsakymas_o=ats_obj)
+                # ats_obj = orm_gauti_atsakyma(ats_id=atsx[0])
+                # orm_vartotoj_atsakym(testo_ses=self.s, atsakymas_o=ats_obj)
+                if atsx[3] > 0:
+                    ats_obj = orm_gauti_atsakyma(ats_id=atsx[0])
+                    orm_vartotoj_atsakym(testo_ses=self.s, atsakymas_o=ats_obj)
 
     def testo_uzrakinimas(self):
         self.stop_laikm()

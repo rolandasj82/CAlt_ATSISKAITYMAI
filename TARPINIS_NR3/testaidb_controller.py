@@ -13,21 +13,64 @@ def orm_gauti_atsakymus_pagal_klid(kl_id, sess=session):
     return atsak_l
 
 
-def orm_atlikti_testai(vartotoj_sess, sess=session):
-    if vartotoj_sess.admin_teises:
-        result = sess.query(Vartotojas, Sesija, VartotojoAtsakymas, Atsakymas, Klausimas, Tema).join(Sesija,
-                                                                                                     Vartotojas.id == Sesija.vartotojas_id).join(
-            VartotojoAtsakymas, Sesija.id == VartotojoAtsakymas.sesija_id).join(Atsakymas,
-                                                                                VartotojoAtsakymas.atsakymas_id == Atsakymas.id).join(
-            Klausimas, Atsakymas.klausimas_id == Klausimas.id).join(Tema, Klausimas.tema_id == Tema.id).all()
-    else:
-        result = sess.query(Vartotojas, Sesija, VartotojoAtsakymas, Atsakymas, Klausimas, Tema).join(Sesija,
-                                                                                                     Vartotojas.id == Sesija.vartotojas_id).join(
-            VartotojoAtsakymas, Sesija.id == VartotojoAtsakymas.sesija_id).join(Atsakymas,
-                                                                                VartotojoAtsakymas.atsakymas_id == Atsakymas.id).join(
-            Klausimas, Atsakymas.klausimas_id == Klausimas.id).join(Tema, Klausimas.tema_id == Tema.id).filter(
-            Vartotojas.id == vartotoj_sess.id).all()
-    return result
+def orm_visi_klausimai_pagal_temos_id(tem_id):
+    pass
+    rez = session.query(Tema, Klausimas, Atsakymas) \
+        .join(Klausimas, Tema.id == Klausimas.tema_id) \
+        .join(Atsakymas, Klausimas.id == Atsakymas.klausimas_id).filter(Tema.id == tem_id)
+    zodynas = {}
+    kl_id_l = []
+    ats_l = []
+    for tem, kl, ats in rez:
+        if kl.id not in kl_id_l:
+            kl_id_l.append(kl.id)
+            ats_l = []
+            ats_l.append([ats.id, ats.vardas, ats.balas])
+        else:
+            ats_l.append([ats.id, ats.vardas, ats.balas])
+        zodynas.update({f"{kl.id}||{kl.pavadinimas}": ats_l})
+    return zodynas
+
+
+def orm_sesiju_istorija_pagal_vart_id(vart_id):
+    pass
+    rez = session.query(Vartotojas, Sesija, VartotojoAtsakymas, Atsakymas, Klausimas, Tema) \
+        .join(Sesija, Vartotojas.id == Sesija.vartotojas_id) \
+        .join(VartotojoAtsakymas, Sesija.id == VartotojoAtsakymas.sesija_id) \
+        .join(Atsakymas, VartotojoAtsakymas.atsakymas_id == Atsakymas.id) \
+        .join(Klausimas, Atsakymas.klausimas_id == Klausimas.id) \
+        .join(Tema, Klausimas.tema_id == Tema.id).filter(Vartotojas.id == vart_id).group_by(Sesija.id)
+    visi_ses_atsak = []
+    for vart, ses, vats, ats, kl, tem in rez:
+        # 0-sesid, 1-temid, 2-tempav
+        visi_ses_atsak.append([ses.id, tem.id, tem.pavadinimas])
+    return visi_ses_atsak
+
+
+def orm_visi_vartot_atsakym_pagal_ses_id(ses_id):
+    pass
+    rez = session.query(VartotojoAtsakymas).filter(VartotojoAtsakymas.sesija_id == ses_id).all()
+    vatsakym_l = []
+    for va in rez:
+        vatsakym_l.append([va.sesija_id, va.atsakymas_id])
+    return vatsakym_l
+
+
+# def orm_atlikti_testai(vartotoj_sess, sess=session):
+#     if vartotoj_sess.admin_teises:
+#         result = sess.query(Vartotojas, Sesija, VartotojoAtsakymas, Atsakymas, Klausimas, Tema).outerjoin(Sesija,
+#                                                                                                           Vartotojas.id == Sesija.vartotojas_id).join(
+#             VartotojoAtsakymas, Sesija.id == VartotojoAtsakymas.sesija_id).join(Atsakymas,
+#                                                                                 VartotojoAtsakymas.atsakymas_id == Atsakymas.id).join(
+#             Klausimas, Atsakymas.klausimas_id == Klausimas.id).join(Tema, Klausimas.tema_id == Tema.id).all()
+#     else:
+#         result = sess.query(Vartotojas, Sesija, VartotojoAtsakymas, Atsakymas, Klausimas, Tema).outerjoin(Sesija,
+#                                                                                                           Vartotojas.id == Sesija.vartotojas_id).join(
+#             VartotojoAtsakymas, Sesija.id == VartotojoAtsakymas.sesija_id).join(Atsakymas,
+#                                                                                 VartotojoAtsakymas.atsakymas_id == Atsakymas.id).join(
+#             Klausimas, Atsakymas.klausimas_id == Klausimas.id).join(Tema, Klausimas.tema_id == Tema.id).filter(
+#             Vartotojas.id == vartotoj_sess.id).all()
+#     return result
 
 
 def orm_vartotoj_atsakym(testo_ses, atsakymas_o, sess=session):
@@ -210,3 +253,4 @@ def admin_vartotojas(sess=session):
 
 if __name__ == '__main__':
     pass
+    orm_visi_klausimai_pagal_temos_id(1)
